@@ -1,0 +1,30 @@
+{
+  "name": "mysignal",
+  "version": "0.1.0",
+  "description": "Firebase and Huawei Cloud Messaging SDK for Nodejs",
+  "main": "src/admin.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "firebase",
+    "hcm-admin",
+    "push",
+    "huawei"
+  ],
+  "author": "mutagen-d",
+  "license": "ISC",
+  "dependencies": {
+    "hcm-admin": "^0.1.1"
+  },
+  "devDependencies": {
+    "firebase-admin": "^11.9.0"
+  },
+  "peerDependencies": {
+    "firebase-admin": "^11"
+  }
+}
