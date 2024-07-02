@@ -28,9 +28,9 @@ const getConfigKey = (config) => {
   if (!config || !Object.keys(config).length) {
     return DEFAULT_KEY;
   }
-  const { appId, appSecret, authUrl, pushUrl, topicUrl, retryConfig } = config;
-  const values = [appId, appSecret, authUrl, pushUrl, topicUrl, getRetryConfigKey(retryConfig)];
-  const rawKey = values.map(v => v || null).join('-')
+  const { appId, appSecret, authUrl, pushUrl, topicUrl, retryConfig, authTimeout, messagingTimeout } = config;
+  const values = [appId, appSecret, authUrl, pushUrl, topicUrl, authTimeout, messagingTimeout, getRetryConfigKey(retryConfig)];
+  const rawKey = values.map(v => typeof v === 'undefined' ? null : v).join('-')
   const isFirstConfig = Object.keys(CONFIG_KEYS).length === 0;
   if (isFirstConfig) {
     CONFIG_KEYS[rawKey] = DEFAULT_KEY;
