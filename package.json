@@ -1,6 +1,6 @@
 {
   "name": "mysignal",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Firebase and Huawei Cloud Messaging SDK for Nodejs",
   "main": "src/admin.js",
   "scripts": {
