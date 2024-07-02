@@ -9,6 +9,23 @@ const { HuaweiMessage } = require('./huawei-message')
  * }} MessagingOptions
  */
 
+function toJSON() {
+  return {
+    message: this.message,
+    code: this.code,
+  }
+}
+
+class Duration {
+  constructor() {
+    this.startTime = Date.now();
+  }
+
+  ms() {
+    return Date.now() - this.startTime;
+  }
+}
+
 /**
  * @typedef {import('firebase-admin/lib/messaging/messaging-api').BaseMessage} BaseMessage
  * @typedef {import('firebase-admin/lib/messaging/messaging-api').TopicMessage} TopicMessage
@@ -42,13 +59,17 @@ class MysignalMessaging {
    * @param {string} topic
    */
   async firebaseSubscribeToTopic(tokenOrTokens, topic) {
+    const duration = new Duration()
     try {
+      /** @type {import('firebase-admin/lib/messaging/messaging-api').MessagingTopicManagementResponse & { duration: number }} */
       const response = await getFirebaseAdmin()
         .messaging(this.opts.firebase)
         .subscribeToTopic(tokenOrTokens, topic)
+      response.duration = duration.ms()
       return response
     } catch (e) {
-      return { originalError: e }
+      e.toJSON = toJSON;
+      return { originalError: e, duration: duration.ms() }
     }
   }
 
@@ -58,16 +79,20 @@ class MysignalMessaging {
    * @param {string} topic
    */
   async huaweiSubscribeToTopic(tokenOrTokens, topic) {
+    const duration = new Duration()
     try {
+      /** @type {import('hcm-admin/dist/push/modle/topic').TopicResponse & { duration: number }} */
       const response = await getHuaweiAdmin(this.opts.huawei)
         .topic()
         .subScribeTopic({
           tokenArray: Array.isArray(tokenOrTokens) ? tokenOrTokens : [tokenOrTokens],
           topic,
         })
+      response.duration = duration.ms()
       return response
     } catch (e) {
-      return { originalError: e }
+      e.toJSON = toJSON;
+      return { originalError: e, duration: duration.ms() }
     }
   }
 
@@ -89,13 +114,17 @@ class MysignalMessaging {
    * @param {string} topic
    */
   async firebaseUnsubscribeFromTopic(tokenOrTokens, topic) {
+    const duration = new Duration()
     try {
+      /** @type {import('firebase-admin/lib/messaging/messaging-api').MessagingTopicManagementResponse & { duration: number }} */
       const response = await getFirebaseAdmin()
         .messaging(this.opts.firebase)
         .unsubscribeFromTopic(tokenOrTokens, topic)
+      response.duration = duration.ms();
       return response
     } catch (e) {
-      return { originalError: e }
+      e.toJSON = toJSON;
+      return { originalError: e, duration: duration.ms() }
     }
   }
 
@@ -105,16 +134,20 @@ class MysignalMessaging {
    * @param {string} topic
    */
   async huaweiUnsubscribeFromTopic(tokenOrTokens, topic) {
+    const duration = new Duration()
     try {
+      /** @type {import('hcm-admin/dist/push/modle/topic').TopicResponse & { duration: number }} */
       const response = await getHuaweiAdmin(this.opts.huawei)
         .topic()
         .unSubScribeTopic({
           tokenArray: Array.isArray(tokenOrTokens) ? tokenOrTokens : [tokenOrTokens],
           topic,
         })
+      response.duration = duration.ms()
       return response
     } catch (e) {
-      return { originalError: e }
+      e.toJSON = toJSON;
+      return { originalError: e, duration: duration.ms() }
     }
   }
 
@@ -135,14 +168,16 @@ class MysignalMessaging {
    * @protected
    * @param {TopicMessage | ConditionMessage | TokenMessage} message
    * @param {boolean} [dryRun]
-   * @returns {Promise<{ messageId?: string; originalError?: Error }>}
+   * @returns {Promise<{ messageId?: string; originalError?: Error; duration: number }>}
    */
   async firebaseSend(message, dryRun = false) {
+    const duration = new Duration()
     try {
       const messageId = await getFirebaseAdmin().messaging(this.opts.firebase).send(message, dryRun)
-      return { messageId }
+      return { messageId, duration: duration.ms() }
     } catch (e) {
-      return { originalError: e }
+      e.toJSON = toJSON;
+      return { originalError: e, duration: duration.ms() }
     }
   }
 
@@ -152,8 +187,10 @@ class MysignalMessaging {
    * @param {boolean} [dryRun]
    */
   async huaweiSend(message, dryRun = false) {
+    const duration = new Duration()
     try {
       const { topic, condition, token, tokens } = message
+      /** @type {import('hcm-admin/dist/push/modle/message').MsgResponse & { duration: number }} */
       const response = await getHuaweiAdmin(this.opts.huawei)
         .messaging()
         .send(
@@ -166,9 +203,11 @@ class MysignalMessaging {
           false,
           dryRun
         )
+      response.duration = duration.ms()
       return response
     } catch (e) {
-      return { originalError: e }
+      e.toJSON = toJSON;
+      return { originalError: e, duration: duration.ms() }
     }
   }
 
@@ -204,14 +243,18 @@ class MysignalMessaging {
    * @param {boolean} [dryRun]
    */
   async firebaseSendEach(tokenOrTokens, message, dryRun = false) {
+    const duration = new Duration()
     const tokens = Array.isArray(tokenOrTokens) ? tokenOrTokens : [tokenOrTokens]
     try {
+      /** @type {import('firebase-admin/lib/messaging/messaging-api').BatchResponse & { duration: number }} */
       const respnonse = await getFirebaseAdmin()
         .messaging()
         .sendEachForMulticast({ ...message, tokens }, dryRun)
+      respnonse.duration = duration.ms();
       return respnonse
     } catch (e) {
-      return { originalError: e }
+      e.toJSON = toJSON;
+      return { originalError: e, duration: duration.ms() }
     }
   }
 }
