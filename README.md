@@ -24,6 +24,7 @@ const serviceAccount = require('./firebase-service-account.json')
 const huaweiConfig = require('./huawei-config.json')
 
 const admin = new MysignalAdmin()
+// initialize FCM and HCM
 admin.initializeApp({
   firebase: {
     credential: firebaseAdmin.credential.cert(serviceAccount),
@@ -33,7 +34,15 @@ admin.initializeApp({
     appSecret: huaweiConfig.appSecret,
   }
 })
+// or just initialize one service
+// firebase
+admin.initializeFirebase({
+  credential: firebaseAdmin.credential.cert(serviceAccount),
+})
+// or huawei
+admin.initializeHuawei(huaweiConfig)
 
+// send notification
 await admin.messaging().send({
   token: '<some push token>',
   notification: {

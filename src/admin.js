@@ -14,8 +14,6 @@ class MysignalAdmin {
   constructor(config) {
     /** @protected */
     this.config = config;
-    /** @protected */
-    this._initialized = false;
     if (config) {
       this.initializeApp(config)
     }
@@ -23,18 +21,29 @@ class MysignalAdmin {
 
   /** @param {AppConfig} [config] */
   initializeApp(config) {
-    if (this._initialized) {
-      return this;
-    }
     config = config || this.config;
     if (config && config.firebase) {
-      getFirebaseAdmin().initializeApp(config.firebase)
+      this.initializeFirebase(config.firebase)
     }
     if (config && config.huawei) {
-      getHuaweiAdmin().init(config.huawei)
+      this.initializeHuawei(config.huawei)
     }
-    this._initialized = true;
     return this;
+  }
+
+  /**
+   * @param {AppConfig['firebase']} firebaseConfig 
+   * @param {string} [name]
+   */
+  initializeFirebase(firebaseConfig, name) {
+    return getFirebaseAdmin().initializeApp(firebaseConfig, name)
+  }
+
+  /**
+   * @param {AppConfig['huawei']} huaweiConfig 
+   */
+  initializeHuawei(huaweiConfig) {
+    return getHuaweiAdmin(huaweiConfig)
   }
 
   /** @param {import('./messaging').MessagingOptions} [options] */
